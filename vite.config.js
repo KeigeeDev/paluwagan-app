@@ -10,8 +10,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
-        name: 'Paluwagan App',
-        short_name: 'Paluwagan',
+        name: 'Digital Paluwagan',
+        short_name: 'e-Paluwagan',
         description: 'Manage your paluwagan contributions and loans easily.',
         theme_color: '#ffffff',
         icons: [
