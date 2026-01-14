@@ -66,6 +66,9 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.3.0 - PWA Support
+*   **Progressive Web App (PWA):** Enable offline capabilities and app installation on mobile/desktop devices. Added Service Worker and Web App Manifest.
+
 ### v1.2.0 - Payment Approval & Interactive Tables
 *   **Payment Approval Workflow:** "Pay" actions now create a `PAYMENT` request that requires Admin approval before deducting from the loan balance, improving security and validation.
 *   **Interactive Transaction Table:** Added column-based filtering (Date, Type, Name, Status) to the Member Dashboard for easier data management.
