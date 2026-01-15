@@ -11,6 +11,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
     signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
     signOut,
     onAuthStateChanged
 } from 'firebase/auth';
@@ -32,6 +33,30 @@ export function AuthProvider({ children }) {
     // Function to Login
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
+    }
+
+    // Function to Signup
+    async function signup(email, password, displayName) {
+        const result = await createUserWithEmailAndPassword(auth, email, password);
+        const user = result.user;
+
+        // Create user document in Firestore
+        const userDocRef = doc(db, "users", user.uid);
+        const newProfile = {
+            email: user.email,
+            displayName: displayName || "",
+            role: "member",
+            createdAt: new Date().toISOString()
+        };
+
+        await setDoc(userDocRef, newProfile);
+
+        // Update local state immediately
+        setUserRole("member");
+        setUserProfile(newProfile);
+        setCurrentUser(user);
+
+        return result;
     }
 
     // Function to Logout
@@ -90,6 +115,7 @@ export function AuthProvider({ children }) {
         userRole,
         userProfile,
         login,
+        signup,
         logout
     };
 
