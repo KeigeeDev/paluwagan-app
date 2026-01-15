@@ -66,6 +66,14 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.5.0 - Transaction Details Modal
+*   **Detailed View:** Added a modal popup for viewing transaction details without navigating away from the dashboard list.
+*   **Information Breakdown:**
+    *   **Utang:** Displays Principal, Interest Rate, Total Interest, and Current Balance.
+    *   **Payment:** Shows Amount Paid and links to the specific Utang record with its current balance.
+    *   **Hulog:** Shows verified deposit amount.
+*   **UI/UX Improvement:** Integrated into both **Member** (row click) and **Admin** (card click) dashboards with a darkened background for better focus.
+
 ### v1.4.0 - Member Signup Feature
 *   **Self-Service Signup:** New users can now create their own accounts with a display name, automatically assigned the "Member" role.
 *   **Authentication Flow:** Enhanced Login/Signup UI with toggle functionality and password validation.
