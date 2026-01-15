@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { requestUtang, requestHulog, fetchTransactions, requestPayment } from '../transactions/transactionService';
 import { addLinkedMember, getLinkedMembers } from '../members/memberService';
+import TransactionModal from '../transactions/TransactionModal';
 
 export default function MemberDashboard() {
     const { currentUser, userProfile } = useAuth();
@@ -25,6 +26,9 @@ export default function MemberDashboard() {
 
     // Hulog Form State
     const [hulogAmount, setHulogAmount] = useState('');
+
+    // Modal State
+    const [selectedTransaction, setSelectedTransaction] = useState(null);
 
     // Load Data
     useEffect(() => {
@@ -434,16 +438,16 @@ export default function MemberDashboard() {
                                     <td className="p-4 text-slate-500 text-sm">{new Date(t.date.seconds * 1000).toLocaleDateString()}</td>
                                     <td className="p-4 font-medium text-sm">
                                         <span className={`px-2 py-1 rounded ${t.type === 'HULOG' ? 'bg-emerald-100 text-emerald-700' :
-                                                t.type === 'PAYMENT' ? 'bg-indigo-100 text-indigo-700' :
-                                                    'bg-rose-100 text-rose-700'
+                                            t.type === 'PAYMENT' ? 'bg-indigo-100 text-indigo-700' :
+                                                'bg-rose-100 text-rose-700'
                                             }`}>
                                             {t.type}
                                         </span>
                                     </td>
-                                    <td className="p-4 text-sm font-medium text-slate-700">{t.beneficiaryName || 'Self'}</td>
-                                    <td className={`p-4 font-bold ${t.type === 'HULOG' ? 'text-primary' :
-                                            t.type === 'PAYMENT' ? 'text-indigo-600' :
-                                                'text-danger'
+                                    <td onClick={() => setSelectedTransaction(t)} className="p-4 text-sm font-medium text-slate-700 cursor-pointer hover:text-primary transition">{t.beneficiaryName || 'Self'}</td>
+                                    <td onClick={() => setSelectedTransaction(t)} className={`p-4 font-bold cursor-pointer hover:opacity-80 transition ${t.type === 'HULOG' ? 'text-primary' :
+                                        t.type === 'PAYMENT' ? 'text-indigo-600' :
+                                            'text-danger'
                                         }`}>
                                         {t.type === 'UTANG' ? t.balance.toFixed(2) : t.amount.toFixed(2)}
                                     </td>
@@ -476,6 +480,13 @@ export default function MemberDashboard() {
                     </table>
                 </div>
             </div>
+            {/* Transaction Details Modal */}
+            <TransactionModal
+                isOpen={!!selectedTransaction}
+                onClose={() => setSelectedTransaction(null)}
+                transaction={selectedTransaction}
+                allTransactions={transactions}
+            />
         </div>
     );
 }

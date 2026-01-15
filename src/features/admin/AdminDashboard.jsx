@@ -8,10 +8,12 @@ import {
 } from '../transactions/transactionService';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from '../../config/firebase';
+import TransactionModal from '../transactions/TransactionModal';
 
 export default function AdminDashboard() {
     const [transactions, setTransactions] = useState([]);
     const [selectedYear, setSelectedYear] = useState(getFiscalYear()); // Default to current year
+    const [selectedTransaction, setSelectedTransaction] = useState(null);
 
     const loadData = async () => {
         // 'admin' argument fetches ALL records, filtered by year if selected
@@ -103,7 +105,7 @@ export default function AdminDashboard() {
             <div className="grid gap-4">
                 {transactions.map(t => (
                     <div key={t.id} className="bg-white p-4 rounded shadow flex flex-col sm:flex-row justify-between items-start sm:items-center border-l-4 border-secondary gap-4">
-                        <div>
+                        <div onClick={() => setSelectedTransaction(t)} className="flex-1 cursor-pointer hover:bg-slate-50 p-2 rounded transition">
                             <p className="font-bold">{t.type} Request</p>
                             <p className="text-sm text-slate-500">
                                 {t.beneficiaryName || 'User'} — {t.type === 'UTANG' ? `Balance: ${t.balance}` : `Amount: ${t.amount}`}
@@ -136,6 +138,14 @@ export default function AdminDashboard() {
                     </div>
                 ))}
             </div>
+
+            {/* Transaction Details Modal */}
+            <TransactionModal
+                isOpen={!!selectedTransaction}
+                onClose={() => setSelectedTransaction(null)}
+                transaction={selectedTransaction}
+                allTransactions={transactions}
+            />
         </div>
     );
 }
