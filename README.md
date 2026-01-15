@@ -66,6 +66,10 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.4.0 - Member Signup Feature
+*   **Self-Service Signup:** New users can now create their own accounts with a display name, automatically assigned the "Member" role.
+*   **Authentication Flow:** Enhanced Login/Signup UI with toggle functionality and password validation.
+
 ### v1.3.0 - PWA Support
 *   **Progressive Web App (PWA):** Enable offline capabilities and app installation on mobile/desktop devices. Added Service Worker and Web App Manifest.
 
