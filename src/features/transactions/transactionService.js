@@ -134,13 +134,23 @@ export const fetchTransactions = async (userRole, uid, fiscalYear = null) => {
 
         if (fiscalYear) {
             constraints.push(where("fiscalYear", "==", Number(fiscalYear)));
+        } else {
+            // Only apply orderBy if NOT filtering by fiscalYear to prevent "Missing Index" error.
+            // When filtering by custom field, Firestore requires a Composite Index if also sorting.
+            constraints.push(orderBy("date", "desc"));
         }
-
-        constraints.push(orderBy("date", "desc"));
 
         const q = query(ref, ...constraints);
         const snapshot = await getDocs(q);
-        return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        let transactions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Manual Sort if using Fiscal Year filter
+        if (fiscalYear) {
+            transactions.sort((a, b) => b.date.toMillis() - a.date.toMillis());
+        }
+
+        return transactions;
     } catch (error) {
         console.error("Error fetching transactions:", error);
         return [];
