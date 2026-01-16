@@ -139,6 +139,13 @@ export default function MemberDashboard() {
 
         const memberIdToSave = selectedMemberId === 'main' ? null : selectedMemberId;
 
+        if (memberIdToSave) {
+            const member = linkedMembers.find(m => m.id === memberIdToSave);
+            if (member && (member.status === 'rejected' || member.status === 'pending')) {
+                return alert(`Cannot create transaction for ${member.status} member.`);
+            }
+        }
+
         await requestUtang(currentUser.uid, amount, beneficiaryType, finalName, memberIdToSave);
         setShowUtangForm(false);
         setAmount('');
@@ -152,6 +159,13 @@ export default function MemberDashboard() {
 
         const displayName = getCurrentProfileName();
         const memberIdToSave = selectedMemberId === 'main' ? null : selectedMemberId;
+
+        if (memberIdToSave) {
+            const member = linkedMembers.find(m => m.id === memberIdToSave);
+            if (member && (member.status === 'rejected' || member.status === 'pending')) {
+                return alert(`Cannot create transaction for ${member.status} member.`);
+            }
+        }
 
         await requestHulog(currentUser.uid, hulogAmount, displayName, memberIdToSave);
         setShowHulogForm(false);
@@ -202,9 +216,14 @@ export default function MemberDashboard() {
                         onChange={(e) => setSelectedMemberId(e.target.value)}
                     >
                         <option value="main">Main Account</option>
-                        {linkedMembers.map(m => (
-                            <option key={m.id} value={m.id}>{m.name} ({m.relationship})</option>
-                        ))}
+                        {linkedMembers
+                            .filter(m => m.status !== 'rejected')
+                            .map(m => (
+                                <option key={m.id} value={m.id}>
+                                    {m.name} ({m.relationship})
+                                    {m.status === 'pending' ? ' - PENDING' : ''}
+                                </option>
+                            ))}
                     </select>
 
                     <button
