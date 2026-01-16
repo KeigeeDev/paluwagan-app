@@ -66,6 +66,17 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.6.0 - Transactions & Members Pages
+*   **Transactions Page:** Dedicated page for detailed transaction history.
+    *   **Admin View:** See all transactions across the system with fiscal year filtering.
+    *   **Member View:** See personal and sub-member transactions.
+*   **Members Page (Admin):** New management view listing all Main Members and Sub-members.
+    *   **Financial Aggregates:** Displays Total Hulog, Utang, and Interest for each member.
+    *   **Sub-member Approval:** Admins can now Approve or Reject sub-members created by main users.
+*   **Sub-member Security:**
+    *   **Status Enforcement:** Rejected members are hidden from selection lists.
+    *   **Transaction Blocking:** Prevented creation of Hulog/Utang requests for Pending or Rejected members.
+
 ### v1.5.0 - Transaction Details Modal
 *   **Detailed View:** Added a modal popup for viewing transaction details without navigating away from the dashboard list.
 *   **Information Breakdown:**

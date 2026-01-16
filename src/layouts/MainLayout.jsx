@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../features/auth/AuthContext';
-import { LogOut, Menu, User, X } from 'lucide-react';
+import { LogOut, Menu, User, X, LayoutDashboard, Receipt, Users } from 'lucide-react';
 
 export default function MainLayout() {
     const { logout, currentUser, userRole } = useAuth();
     const navigate = useNavigate();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+    // Helper to check active route
+    const isActive = (path) => window.location.pathname === path;
 
     const handleLogout = async () => {
         try {
@@ -76,6 +79,37 @@ export default function MainLayout() {
                         </span>
                     </div>
 
+                    <div className="space-y-1 mb-6">
+                        <button
+                            onClick={() => { navigate('/'); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${isActive('/') || isActive('/admin') ? 'bg-primary text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                }`}
+                        >
+                            <LayoutDashboard size={20} />
+                            <span>Dashboard</span>
+                        </button>
+
+                        <button
+                            onClick={() => { navigate('/transactions'); setIsSidebarOpen(false); }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${isActive('/transactions') ? 'bg-primary text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                }`}
+                        >
+                            <Receipt size={20} />
+                            <span>Transactions</span>
+                        </button>
+
+                        {userRole === 'admin' && (
+                            <button
+                                onClick={() => { navigate('/members'); setIsSidebarOpen(false); }}
+                                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${isActive('/members') ? 'bg-primary text-white' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                                    }`}
+                            >
+                                <Users size={20} />
+                                <span>Members</span>
+                            </button>
+                        )}
+                    </div>
+
                     <button
                         onClick={handleLogout}
                         className="w-full flex items-center gap-3 px-4 py-3 text-slate-300 hover:bg-slate-700 hover:text-white rounded-lg transition-colors text-left"
@@ -85,7 +119,6 @@ export default function MainLayout() {
                     </button>
                 </nav>
             </aside>
-
             {/* Main Content Area */}
             <main className="flex-1 overflow-y-auto h-[calc(100vh-64px)] md:h-screen">
                 <div className="md:p-8 p-4">
