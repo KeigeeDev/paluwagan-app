@@ -17,7 +17,8 @@ This application digitizes the entire process, automating interest calculations,
 * **Styling:** Tailwind CSS (Slate & Emerald Theme)
 * **Backend:** Firebase (Firestore Database)
 * **Authentication:** Firebase Auth (Email/Password)
-* **Hosting:** Firebase Hosting (Recommended)
+* **Hosting:** Firebase Hosting
+* **Analytics:** Google Analytics (GA4)
 
 ---
 
@@ -60,11 +61,14 @@ paluwagan-app/
 │   └── App.jsx           # Protected Route Definitions
 
 └── tailwind.config.js    # Theme Customization
-```
 
 ---
 
 ## 📝 Changelog
+
+### v1.8.0 - Google Analytics Integration
+*   **Analytics Tracking:** Integrated Google Analytics (GA4) for page view tracking.
+*   **User Behavior Insights:** Track user navigation patterns and feature usage to improve user experience.
 
 ### v1.7.0 - Admin Balance Management
 *   **Starting Balance Control:** Admins can now manually set the Starting Fund Balance for any fiscal year, enabling accurate tracking of carried-over cash.
