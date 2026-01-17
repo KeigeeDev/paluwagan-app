@@ -14,7 +14,8 @@ import {
     doc,
     updateDoc,
     getDoc,
-    writeBatch
+    writeBatch,
+    setDoc
 } from "firebase/firestore";
 import { db } from "../../config/firebase";
 
@@ -280,6 +281,42 @@ export const runMonthlyInterestCheck = async () => {
         return { success: true, count: updates.length };
     } catch (error) {
         console.error("Interest Error:", error);
+        return { success: false, error };
+    }
+};
+
+/**
+ * Get Starting Balance for a Fiscal Year
+ */
+export const getStartingBalance = async (year) => {
+    try {
+        const docRef = doc(db, "financial_years", String(year));
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            return docSnap.data().startingBalance || 0;
+        }
+        return 0;
+    } catch (error) {
+        console.error("Error fetching starting balance:", error);
+        return 0;
+    }
+};
+
+/**
+ * Set Starting Balance for a Fiscal Year
+ */
+export const setStartingBalance = async (year, amount) => {
+    try {
+        const docRef = doc(db, "financial_years", String(year));
+        await setDoc(docRef, {
+            startingBalance: Number(amount),
+            fiscalYear: Number(year),
+            updatedAt: Timestamp.now()
+        }, { merge: true });
+        return { success: true };
+    } catch (error) {
+        console.error("Error setting starting balance:", error);
         return { success: false, error };
     }
 };

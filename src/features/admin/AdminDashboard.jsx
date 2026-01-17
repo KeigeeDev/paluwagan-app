@@ -4,7 +4,9 @@ import {
     runMonthlyInterestCheck,
     approvePayment,
     archiveFiscalYear,
-    getFiscalYear
+    getFiscalYear,
+    getStartingBalance,
+    setStartingBalance
 } from '../transactions/transactionService';
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from '../../config/firebase';
@@ -14,16 +16,63 @@ export default function AdminDashboard() {
     const [transactions, setTransactions] = useState([]);
     const [selectedYear, setSelectedYear] = useState(getFiscalYear()); // Default to current year
     const [selectedTransaction, setSelectedTransaction] = useState(null);
+    const [startingBalance, setStartingBalanceValue] = useState(0);
+    const [isEditingBalance, setIsEditingBalance] = useState(false);
+    const [newBalanceInput, setNewBalanceInput] = useState('');
 
     const loadData = async () => {
         // 'admin' argument fetches ALL records, filtered by year if selected
         // If selectedYear is 'all', we pass null to fetch everything
         const yearParam = selectedYear === 'all' ? null : selectedYear;
-        const data = await fetchTransactions('admin', null, yearParam);
-        setTransactions(data);
+
+        const [txData, startBal] = await Promise.all([
+            fetchTransactions('admin', null, yearParam),
+            selectedYear !== 'all' ? getStartingBalance(selectedYear) : Promise.resolve(0)
+        ]);
+
+        // Calculate Running Balance
+        // 1. Sort by Date ASCENDING (Oldest first) to calculate running balance
+        // 2. Apply starting balance
+        // 3. Reverse back to DESCENDING (Newest first) for display if needed
+
+        let currentBalance = startBal;
+
+        // We need them in chronological order for calculation
+        const sortedTx = [...txData].sort((a, b) => a.date.toMillis() - b.date.toMillis());
+
+        const txWithBalance = sortedTx.map(t => {
+            if (t.status === 'approved' || t.status === 'paid') {
+                if (t.type === 'HULOG') {
+                    currentBalance += t.amount;
+                } else if (t.type === 'UTANG') {
+                    currentBalance -= t.principal; // Deduct Principal
+                } else if (t.type === 'PAYMENT') {
+                    currentBalance += t.amount;
+                }
+            }
+            return { ...t, runningBalance: currentBalance };
+        });
+
+        // Re-sort to Newest First for Display
+        const finalTx = txWithBalance.sort((a, b) => b.date.toMillis() - a.date.toMillis());
+
+        setTransactions(finalTx);
+        setStartingBalanceValue(startBal);
+        setNewBalanceInput(startBal);
     };
 
     useEffect(() => { loadData(); }, [selectedYear]);
+
+    const handleUpdateStartingBalance = async () => {
+        if (!newBalanceInput) return;
+        const res = await setStartingBalance(selectedYear, newBalanceInput);
+        if (res.success) {
+            setIsEditingBalance(false);
+            loadData();
+        } else {
+            alert("Failed to update starting balance");
+        }
+    };
 
     const handleStatusUpdate = async (transaction, newStatus) => {
         try {
@@ -108,6 +157,35 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
+                {/* Starting Balance Section */}
+                {selectedYear !== 'all' && (
+                    <div className="bg-slate-100 p-4 rounded-lg flex items-center justify-between">
+                        <div>
+                            <p className="text-sm font-semibold text-slate-600">Starting Fund Balance ({selectedYear})</p>
+                            <p className="text-xs text-slate-500">Initial cash on hand before any transactions this year.</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            {isEditingBalance ? (
+                                <>
+                                    <input
+                                        type="number"
+                                        value={newBalanceInput}
+                                        onChange={(e) => setNewBalanceInput(e.target.value)}
+                                        className="p-1 px-2 border rounded w-32"
+                                    />
+                                    <button onClick={handleUpdateStartingBalance} className="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700">Save</button>
+                                    <button onClick={() => setIsEditingBalance(false)} className="text-slate-500 text-xs underline hover:text-slate-700">Cancel</button>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="text-xl font-bold font-mono text-slate-800">₱ {startingBalance.toLocaleString()}</p>
+                                    <button onClick={() => setIsEditingBalance(true)} className="text-blue-600 text-xs underline hover:text-blue-800 ml-2">Edit</button>
+                                </>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Financial Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white p-4 rounded-lg shadow border-l-4 border-emerald-500">
@@ -145,8 +223,13 @@ export default function AdminDashboard() {
                         <div onClick={() => setSelectedTransaction(t)} className="flex-1 cursor-pointer hover:bg-slate-50 p-2 rounded transition">
                             <p className="font-bold">{t.type} Request</p>
                             <p className="text-sm text-slate-500">
-                                {t.beneficiaryName || 'User'} — {t.type === 'UTANG' ? `Balance: ${t.balance}` : `Amount: ${t.amount}`}
+                                {t.beneficiaryName || 'User'} — {t.type === 'UTANG' ? `Balance: ₱${t.balance.toLocaleString()}` : `Amount: ₱${t.amount.toLocaleString()}`}
                             </p>
+                            {t.runningBalance !== undefined && (
+                                <p className="text-xs text-emerald-600 font-mono mt-1">
+                                    Fund Balance: ₱{t.runningBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </p>
+                            )}
                             <p className="text-xs text-slate-400">
                                 Status: <span className={`font-semibold ${t.status === 'paid' ? 'text-blue-600' :
                                     t.status === 'approved' ? 'text-green-600' :
@@ -183,6 +266,6 @@ export default function AdminDashboard() {
                 transaction={selectedTransaction}
                 allTransactions={transactions}
             />
-        </div>
+        </div >
     );
 }

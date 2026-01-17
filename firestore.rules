@@ -33,6 +33,14 @@ service cloud.firestore {
       allow update: if request.auth != null && (isAdmin() || resource.data.uid == request.auth.uid);
       allow delete: if request.auth != null && isAdmin();
     }
+
+    // Financial Years:
+    // - Admin can read/write
+    // - Members can read (needed for dashboard or transparency)
+    match /financial_years/{year} {
+        allow read: if request.auth != null;
+        allow write: if request.auth != null && isAdmin();
+    }
     
     // Default: Deny everything else
     match /{document=**} {
