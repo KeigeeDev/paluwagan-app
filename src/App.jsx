@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
+import ReactGA from 'react-ga4';
 import { AuthProvider, useAuth } from './features/auth/AuthContext';
 import Login from './features/auth/Login';
 import MemberDashboard from './features/dashboard/MemberDashboard';
@@ -27,9 +29,23 @@ const DashboardRedirector = () => {
   return <MemberDashboard />;
 };
 
+// Initialize GA4
+ReactGA.initialize("G-FS4B683V8H");
+
+const PageTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
+  }, [location]);
+
+  return null;
+};
+
 export default function App() {
   return (
     <BrowserRouter>
+      <PageTracker />
       <Routes>
         <Route path="/login" element={<Login />} />
 
