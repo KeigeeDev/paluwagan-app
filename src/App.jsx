@@ -33,11 +33,10 @@ const DashboardRedirector = () => {
 ReactGA.initialize("G-FS4B683V8H");
 
 const PageTracker = () => {
-  const location = useLocation();
 
   useEffect(() => {
-    ReactGA.send({ hitType: "pageview", page: location.pathname + location.search });
-  }, [location]);
+    ReactGA.send({ hitType: "pageview", page: window.location.pathname });
+  }, []);
 
   return null;
 };
