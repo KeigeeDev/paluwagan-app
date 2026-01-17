@@ -66,6 +66,13 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.7.0 - Admin Balance Management
+*   **Starting Balance Control:** Admins can now manually set the Starting Fund Balance for any fiscal year, enabling accurate tracking of carried-over cash.
+*   **Running Fund Balance:**
+    *   **Real-time Calculation:** The Admin Transaction list now calculates and displays the running "Fund Balance" after each transaction.
+    *   **Visual Tracking:** Added an "Ending Balance" line item to transaction cards for immediate visibility of cash flow impact.
+*   **Security Updates:** Updated `firestore.rules` to secure the new `financial_years` collection.
+
 ### v1.6.0 - Transactions & Members Pages
 *   **Transactions Page:** Dedicated page for detailed transaction history.
     *   **Admin View:** See all transactions across the system with fiscal year filtering.
