@@ -112,3 +112,18 @@ export const rejectSubMember = async (parentId, subMemberId) => {
         return { success: false, error };
     }
 };
+/**
+ * Admin: Update a user's display email in Firestore
+ * @param {string} uid 
+ * @param {string} newEmail 
+ */
+export const updateUserEmail = async (uid, newEmail) => {
+    try {
+        const userRef = doc(db, USERS_COLLECTION, uid);
+        await updateDoc(userRef, { email: newEmail });
+        return { success: true };
+    } catch (error) {
+        console.error("Error updating user email:", error);
+        return { success: false, error: error.message };
+    }
+};
