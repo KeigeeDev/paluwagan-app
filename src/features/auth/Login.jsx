@@ -11,7 +11,7 @@ export default function Login() {
     const [isLogin, setIsLogin] = useState(true);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { login, signup, currentUser } = useAuth();
+    const { login, signup, loginWithGoogle, currentUser } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -39,6 +39,19 @@ export default function Login() {
         } catch (err) {
             console.error(err);
             setError('Failed to log in. Please check your credentials.');
+            setLoading(false);
+        }
+    };
+
+    const handleGoogleSignIn = async () => {
+        try {
+            setError('');
+            setLoading(true);
+            await loginWithGoogle();
+            // Navigation is handled by useEffect (currentUser watch)
+        } catch (err) {
+            console.error(err);
+            setError('Google sign-in failed. Please try again.');
             setLoading(false);
         }
     };
@@ -125,6 +138,29 @@ export default function Login() {
                             className="w-full bg-primary hover:bg-emerald-600 text-white font-bold py-3 rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Sign Up')}
+                        </button>
+
+                        {/* Divider */}
+                        <div className="flex items-center gap-3">
+                            <div className="flex-1 h-px bg-slate-200" />
+                            <span className="text-xs text-slate-400 font-medium">OR</span>
+                            <div className="flex-1 h-px bg-slate-200" />
+                        </div>
+
+                        {/* Google Sign-In Button */}
+                        <button
+                            type="button"
+                            onClick={handleGoogleSignIn}
+                            disabled={loading}
+                            className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold py-3 rounded-lg transition-colors shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" className="w-5 h-5 flex-shrink-0">
+                                <path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.08 7.74 2.85l5.77-5.77C33.91 3.45 29.27 1.5 24 1.5 14.97 1.5 7.38 6.91 3.9 14.6l6.72 5.22C12.4 13.47 17.73 9.5 24 9.5z"/>
+                                <path fill="#4285F4" d="M46.1 24.5c0-1.64-.15-3.22-.42-4.74H24v8.98h12.42c-.54 2.88-2.17 5.32-4.62 6.96l7.1 5.52C43.23 37.13 46.1 31.27 46.1 24.5z"/>
+                                <path fill="#FBBC05" d="M10.62 28.18A14.56 14.56 0 0 1 9.5 24c0-1.45.25-2.86.62-4.18L3.4 14.6A22.46 22.46 0 0 0 1.5 24c0 3.37.73 6.56 2.04 9.43l7.08-5.25z"/>
+                                <path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.74 12.92-4.74l-7.1-5.52c-1.75 1.17-3.99 1.86-5.82 1.86-6.27 0-11.6-3.97-13.38-9.92l-7.08 5.25C7.38 41.09 14.97 46.5 24 46.5z"/>
+                            </svg>
+                            Continue with Google
                         </button>
                     </form>
 

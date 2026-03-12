@@ -12,11 +12,12 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
+    signInWithPopup,
     signOut,
     onAuthStateChanged
 } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../config/firebase';
+import { auth, db, googleProvider } from '../../config/firebase';
 
 const AuthContext = createContext();
 
@@ -33,6 +34,29 @@ export function AuthProvider({ children }) {
     // Function to Login
     function login(email, password) {
         return signInWithEmailAndPassword(auth, email, password);
+    }
+
+    // Function to Login with Google
+    async function loginWithGoogle() {
+        const result = await signInWithPopup(auth, googleProvider);
+        const user = result.user;
+
+        // Only create a Firestore document if it doesn't already exist
+        const userDocRef = doc(db, "users", user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            const newProfile = {
+                email: user.email,
+                displayName: user.displayName || "",
+                photoURL: user.photoURL || "",
+                role: "member",
+                createdAt: new Date().toISOString()
+            };
+            await setDoc(userDocRef, newProfile);
+        }
+
+        return result;
     }
 
     // Function to Signup
@@ -115,6 +139,7 @@ export function AuthProvider({ children }) {
         userRole,
         userProfile,
         login,
+        loginWithGoogle,
         signup,
         logout
     };
