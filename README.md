@@ -66,6 +66,14 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.9.0 - Admin Email Management & User Migration
+*   **Admin Email Editing:** Admins can now update a user's display email in Firestore directly from the Members Page.
+*   **Email Edit Modal:** Added a new interactive modal for managing user email addresses with validation.
+*   **User Migration Utility:** Created a `migrate-user.js` backend script to facilitate moving user data (profiles, transactions, sub-members) from old accounts to new Google Sign-in accounts.
+*   **Security & Maintenance:** 
+    *   Integrated `firebase-admin` for secure identity management.
+    *   Updated `.gitignore` to exclude sensitive service account keys.
+
 ### v1.8.0 - Google Analytics Integration
 *   **Analytics Tracking:** Integrated Google Analytics (GA4) for page view tracking.
 *   **User Behavior Insights:** Track user navigation patterns and feature usage to improve user experience.
