@@ -64,6 +64,12 @@ export const fetchAllMembersWithSubMembers = async () => {
         // For each user (Main Member), fetch their details AND their sub-members
         for (const userDoc of usersSnap.docs) {
             const userData = { id: userDoc.id, ...userDoc.data(), type: 'MAIN' };
+
+            // Hide the user role ADMIN from the list
+            if (userData.role === 'admin' || userData.role === 'ADMIN') {
+                continue;
+            }
+
             allData.push(userData);
 
             // Fetch sub-members
