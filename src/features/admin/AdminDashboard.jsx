@@ -16,6 +16,8 @@ export default function AdminDashboard() {
     const [transactions, setTransactions] = useState([]);
     const [selectedYear, setSelectedYear] = useState(getFiscalYear()); // Default to current year
     const [selectedTransaction, setSelectedTransaction] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const transactionsPerPage = 10;
     const [startingBalance, setStartingBalanceValue] = useState(0);
     const [isEditingBalance, setIsEditingBalance] = useState(false);
     const [newBalanceInput, setNewBalanceInput] = useState('');
@@ -60,6 +62,7 @@ export default function AdminDashboard() {
         setTransactions(finalTx);
         setStartingBalanceValue(startBal);
         setNewBalanceInput(startBal);
+        setCurrentPage(1);
     };
 
     useEffect(() => { loadData(); }, [selectedYear]);
@@ -123,6 +126,13 @@ export default function AdminDashboard() {
         }
     };
 
+    // Pagination logic
+    const indexOfLastTransaction = currentPage * transactionsPerPage;
+    const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+    const currentTransactions = transactions.slice(indexOfFirstTransaction, indexOfLastTransaction);
+    const totalPages = Math.ceil(transactions.length / transactionsPerPage);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     return (
         <div className="p-4 md:p-6">
@@ -216,7 +226,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
             <div className="grid gap-4">
-                {transactions.map(t => (
+                {currentTransactions.map(t => (
                     <div key={t.id} className="bg-white p-4 rounded shadow flex flex-col sm:flex-row justify-between items-start sm:items-center border-l-4 border-secondary gap-4">
                         <div onClick={() => setSelectedTransaction(t)} className="flex-1 cursor-pointer hover:bg-slate-50 p-2 rounded transition">
                             <p className="font-bold">{t.type} Request</p>
@@ -256,6 +266,29 @@ export default function AdminDashboard() {
                     </div>
                 ))}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+                <div className="flex justify-center items-center gap-2 mt-6">
+                    <button
+                        onClick={() => paginate(currentPage - 1)}
+                        disabled={currentPage === 1}
+                        className="px-3 py-1 border rounded bg-white text-sm disabled:opacity-50 hover:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-sm font-medium text-slate-700 min-w-[100px] text-center">
+                        Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                        onClick={() => paginate(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                        className="px-3 py-1 border rounded bg-white text-sm disabled:opacity-50 hover:bg-slate-50 transition-colors cursor-pointer"
+                    >
+                        Next
+                    </button>
+                </div>
+            )}
 
             {/* Admin Actions Modal */}
             {isActionModalOpen && (

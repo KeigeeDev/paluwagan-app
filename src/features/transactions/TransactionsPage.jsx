@@ -9,6 +9,8 @@ export default function TransactionsPage() {
     const [loading, setLoading] = useState(true);
     const [selectedTransaction, setSelectedTransaction] = useState(null);
     const [selectedYear, setSelectedYear] = useState(getFiscalYear());
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 10;
 
     // Filters
     const [filters, setFilters] = useState({
@@ -25,6 +27,7 @@ export default function TransactionsPage() {
         const yearParam = userRole === 'admin' && selectedYear !== 'all' ? selectedYear : null;
         const data = await fetchTransactions(userRole, currentUser?.uid, yearParam);
         setTransactions(data);
+        setCurrentPage(1);
         setLoading(false);
     };
 
@@ -32,6 +35,7 @@ export default function TransactionsPage() {
         if (currentUser) {
             loadData();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentUser, selectedYear]);
 
     const filteredTransactions = useMemo(() => {
@@ -52,6 +56,21 @@ export default function TransactionsPage() {
             return true;
         });
     }, [transactions, filters]);
+
+    const handleFilterChange = (key, value) => {
+        setFilters(prev => ({ ...prev, [key]: value }));
+        setCurrentPage(1);
+    };
+
+    const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const paginatedTransactions = filteredTransactions.slice(startIndex, startIndex + itemsPerPage);
+
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
+        }
+    };
 
     return (
         <div className="p-4 md:p-6 bg-slate-50 min-h-full">
@@ -98,7 +117,7 @@ export default function TransactionsPage() {
                                             type="date"
                                             className="p-1 border rounded text-xs font-normal normal-case focus:outline-none focus:ring-1 focus:ring-primary w-full"
                                             value={filters.date}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, date: e.target.value }))}
+                                            onChange={(e) => handleFilterChange('date', e.target.value)}
                                         />
                                     </div>
                                 </th>
@@ -108,7 +127,7 @@ export default function TransactionsPage() {
                                         <select
                                             className="p-1 border rounded text-xs font-normal normal-case focus:outline-none focus:ring-1 focus:ring-primary w-full"
                                             value={filters.type}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+                                            onChange={(e) => handleFilterChange('type', e.target.value)}
                                         >
                                             <option value="">All</option>
                                             <option value="HULOG">Hulog</option>
@@ -125,7 +144,7 @@ export default function TransactionsPage() {
                                             placeholder="Filter name..."
                                             className="p-1 border rounded text-xs font-normal normal-case focus:outline-none focus:ring-1 focus:ring-primary w-full min-w-[120px]"
                                             value={filters.name}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, name: e.target.value }))}
+                                            onChange={(e) => handleFilterChange('name', e.target.value)}
                                         />
                                     </div>
                                 </th>
@@ -137,7 +156,7 @@ export default function TransactionsPage() {
                                         <select
                                             className="p-1 border rounded text-xs font-normal normal-case focus:outline-none focus:ring-1 focus:ring-primary w-full"
                                             value={filters.status}
-                                            onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                                            onChange={(e) => handleFilterChange('status', e.target.value)}
                                         >
                                             <option value="">All</option>
                                             <option value="approved">Approved</option>
@@ -154,8 +173,8 @@ export default function TransactionsPage() {
                                 <tr>
                                     <td colSpan="6" className="p-8 text-center text-slate-500">Loading transactions...</td>
                                 </tr>
-                            ) : filteredTransactions.length > 0 ? (
-                                filteredTransactions.map(t => (
+                            ) : paginatedTransactions.length > 0 ? (
+                                paginatedTransactions.map(t => (
                                     <tr
                                         key={t.id}
                                         onClick={() => setSelectedTransaction(t)}
@@ -213,9 +232,34 @@ export default function TransactionsPage() {
                         </tbody>
                     </table>
                 </div>
-                <div className="p-4 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 flex justify-between">
-                    <span>Showing {filteredTransactions.length} records</span>
-                    <span>Note: Click on a row to view details</span>
+                <div className="p-4 bg-slate-50 border-t border-slate-100 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <span>
+                        Showing {filteredTransactions.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredTransactions.length)} of {filteredTransactions.length} records
+                    </span>
+                    
+                    {totalPages > 1 && (
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={() => handlePageChange(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="px-2 py-1 border rounded bg-white text-slate-600 disabled:opacity-50 hover:bg-slate-100 transition-colors cursor-pointer"
+                            >
+                                Previous
+                            </button>
+                            <span className="font-medium text-slate-700 mx-2">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <button
+                                onClick={() => handlePageChange(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="px-2 py-1 border rounded bg-white text-slate-600 disabled:opacity-50 hover:bg-slate-100 transition-colors cursor-pointer"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
+                    
+                    <span className="hidden md:inline">Note: Click on a row to view details</span>
                 </div>
             </div>
 
