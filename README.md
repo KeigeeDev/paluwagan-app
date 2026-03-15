@@ -61,7 +61,7 @@ paluwagan-app/
 │   └── App.jsx           # Protected Route Definitions
 
 └── tailwind.config.js    # Theme Customization
-
+```
 ---
 
 ## 📝 Changelog
