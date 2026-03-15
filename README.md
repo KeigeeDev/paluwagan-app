@@ -66,6 +66,9 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.11.0 - Members Page Updates
+*   **Admin Privacy:** Hid users with the 'ADMIN' role from appearing in the general members list on the Admin Dashboard to prevent clutter and accidental administrative modifications.
+
 ### v1.10.0 - Admin Actions Security Check
 *   **Admin Actions Modal:** Moved destructive/global actions (Run Monthly Interest, Archive Fiscal Year, Edit Starting Balance) into a dedicated "Admin Actions" modal on the Admin Dashboard.
 *   **Accidental Click Prevention:** Requires a deliberate click on the "Admin Actions" button to reveal these tools, reducing the risk of accidental global data modification.
