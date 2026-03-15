@@ -66,6 +66,11 @@ paluwagan-app/
 
 ## 📝 Changelog
 
+### v1.10.0 - Admin Actions Security Check
+*   **Admin Actions Modal:** Moved destructive/global actions (Run Monthly Interest, Archive Fiscal Year, Edit Starting Balance) into a dedicated "Admin Actions" modal on the Admin Dashboard.
+*   **Accidental Click Prevention:** Requires a deliberate click on the "Admin Actions" button to reveal these tools, reducing the risk of accidental global data modification.
+*   **UI/UX Improvements:** Updated Admin Dashboard action buttons with consistent primary, secondary, and danger theme colors.
+
 ### v1.9.0 - Admin Email Management & User Migration
 *   **Admin Email Editing:** Admins can now update a user's display email in Firestore directly from the Members Page.
 *   **Email Edit Modal:** Added a new interactive modal for managing user email addresses with validation.
