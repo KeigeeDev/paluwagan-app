@@ -7,11 +7,23 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: "#10b981", // Emerald 500 - Success/Money
-                secondary: "#3b82f6", // Blue 500 - Actions
-                danger: "#ef4444", // Red 500 - Debt/Errors
-                dark: "#1e293b", // Slate 800 - Text/Headings
-                light: "#f1f5f9", // Slate 100 - Backgrounds
+                primary: "#059669", // Emerald Solid
+                secondary: "#7c3aed", // Royal Violet
+                danger: "#e11d48", // Rose Solid
+                dark: "#0f172a", // Deep Slate
+                light: "#f8fafc", // Soft Slate
+                border: "#e2e8f0", // Structural Border
+            },
+            borderRadius: {
+                'none': '0',
+                'sm': '0',
+                'DEFAULT': '0',
+                'md': '0',
+                'lg': '0',
+                'xl': '0',
+                '2xl': '0',
+                '3xl': '0',
+                'full': '0',
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],

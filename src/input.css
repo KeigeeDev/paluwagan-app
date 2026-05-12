@@ -3,12 +3,13 @@
 
 @layer base {
     :root {
-        font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-        line-height: 1.5;
+        font-family: 'Inter', system-ui, sans-serif;
+        line-height: 1.6;
         font-weight: 400;
-        color: #213547;
-        background-color: #f8fafc;
-        /* light slate */
+        color: #0f172a; /* Deep Slate */
+        background-color: #f8fafc; /* Soft Slate */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
     }
 
     body {

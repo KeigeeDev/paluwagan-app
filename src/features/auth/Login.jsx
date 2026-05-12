@@ -59,120 +59,123 @@ export default function Login() {
     console.log(auth);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-light">
+        <div className="min-h-screen flex items-center justify-center bg-light font-sans">
             <div className="max-w-md w-full mx-4">
-                <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="bg-white border border-border overflow-hidden">
                     {/* Header */}
-                    <div className="bg-primary px-6 py-6 md:px-8">
-                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                            {isLogin ? 'Welcome Back' : 'Create Account'}
+                    <div className="px-8 py-12 border-b border-border text-center">
+                        <h2 className="text-3xl font-bold text-dark tracking-tight mb-2">
+                            {isLogin ? 'WELCOME BACK' : 'CREATE ACCOUNT'}
                         </h2>
-                        <p className="text-emerald-100 text-sm md:text-base">
-                            {isLogin ? 'Sign in to your Paluwagan account' : 'Join our Paluwagan community'}
+                        <p className="text-slate-500 text-xs uppercase tracking-[0.2em] font-bold">
+                            {isLogin ? 'Sign in to the ledger' : 'Join the system'}
                         </p>
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-6">
+                    <form onSubmit={handleSubmit} className="p-8 space-y-8">
                         {error && (
-                            <div className="bg-red-50 text-danger p-3 rounded text-sm text-center">
+                            <div className="border border-danger text-danger p-4 text-xs font-bold uppercase tracking-widest bg-rose-50/50">
                                 {error}
                             </div>
                         )}
 
-                        {!isLogin && (
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">Full Name</label>
+                        <div className="space-y-6">
+                            {!isLogin && (
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Full Name</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        className="w-full px-0 py-3 border-b border-border focus:border-secondary transition-all outline-none bg-transparent text-dark placeholder:text-slate-300"
+                                        placeholder="JUAN DELA CRUZ"
+                                        value={displayName}
+                                        onChange={(e) => setDisplayName(e.target.value)}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Email Address</label>
                                 <input
-                                    type="text"
+                                    type="email"
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
-                                    placeholder="Juan Dela Cruz"
-                                    value={displayName}
-                                    onChange={(e) => setDisplayName(e.target.value)}
+                                    className="w-full px-0 py-3 border-b border-border focus:border-secondary transition-all outline-none bg-transparent text-dark placeholder:text-slate-300"
+                                    placeholder="NAME@EXAMPLE.COM"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
-                        )}
 
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Email Address</label>
-                            <input
-                                type="email"
-                                required
-                                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
-                                placeholder="name@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-700">Password</label>
-                            <input
-                                type="password"
-                                required
-                                className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                        </div>
-
-                        {!isLogin && (
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium text-slate-700">Confirm Password</label>
+                            <div className="space-y-1.5">
+                                <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Password</label>
                                 <input
                                     type="password"
                                     required
-                                    className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all outline-none"
+                                    className="w-full px-0 py-3 border-b border-border focus:border-secondary transition-all outline-none bg-transparent text-dark placeholder:text-slate-300"
                                     placeholder="••••••••"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
-                        )}
 
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full bg-primary hover:bg-emerald-600 text-white font-bold py-3 rounded-lg transition-colors shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Sign Up')}
-                        </button>
-
-                        {/* Divider */}
-                        <div className="flex items-center gap-3">
-                            <div className="flex-1 h-px bg-slate-200" />
-                            <span className="text-xs text-slate-400 font-medium">OR</span>
-                            <div className="flex-1 h-px bg-slate-200" />
+                            {!isLogin && (
+                                <div className="space-y-1.5">
+                                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Confirm Password</label>
+                                    <input
+                                        type="password"
+                                        required
+                                        className="w-full px-0 py-3 border-b border-border focus:border-secondary transition-all outline-none bg-transparent text-dark placeholder:text-slate-300"
+                                        placeholder="••••••••"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                    />
+                                </div>
+                            )}
                         </div>
 
-                        {/* Google Sign-In Button */}
-                        <button
-                            type="button"
-                            onClick={handleGoogleSignIn}
-                            disabled={loading}
-                            className="w-full flex items-center justify-center gap-3 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold py-3 rounded-lg transition-colors shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="20" height="20" className="w-5 h-5 flex-shrink-0">
-                                <path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.08 7.74 2.85l5.77-5.77C33.91 3.45 29.27 1.5 24 1.5 14.97 1.5 7.38 6.91 3.9 14.6l6.72 5.22C12.4 13.47 17.73 9.5 24 9.5z"/>
-                                <path fill="#4285F4" d="M46.1 24.5c0-1.64-.15-3.22-.42-4.74H24v8.98h12.42c-.54 2.88-2.17 5.32-4.62 6.96l7.1 5.52C43.23 37.13 46.1 31.27 46.1 24.5z"/>
-                                <path fill="#FBBC05" d="M10.62 28.18A14.56 14.56 0 0 1 9.5 24c0-1.45.25-2.86.62-4.18L3.4 14.6A22.46 22.46 0 0 0 1.5 24c0 3.37.73 6.56 2.04 9.43l7.08-5.25z"/>
-                                <path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.74 12.92-4.74l-7.1-5.52c-1.75 1.17-3.99 1.86-5.82 1.86-6.27 0-11.6-3.97-13.38-9.92l-7.08 5.25C7.38 41.09 14.97 46.5 24 46.5z"/>
-                            </svg>
-                            Continue with Google
-                        </button>
+                        <div className="space-y-4 pt-4">
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="w-full bg-secondary hover:bg-violet-700 text-white font-bold py-4 px-6 transition-all disabled:opacity-50 text-xs uppercase tracking-widest"
+                            >
+                                {loading ? 'PROCESSING...' : (isLogin ? 'SIGN IN' : 'SIGN UP')}
+                            </button>
+
+                            <div className="relative flex items-center justify-center py-4">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-border"></div>
+                                </div>
+                                <span className="relative bg-white px-4 text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">OR</span>
+                            </div>
+
+                            <button
+                                type="button"
+                                onClick={handleGoogleSignIn}
+                                disabled={loading}
+                                className="w-full flex items-center justify-center gap-3 bg-white border border-border hover:bg-slate-50 text-dark font-bold py-4 px-6 transition-all disabled:opacity-50 text-xs uppercase tracking-widest"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="18" height="18" className="w-4.5 h-4.5">
+                                    <path fill="#EA4335" d="M24 9.5c3.15 0 5.64 1.08 7.74 2.85l5.77-5.77C33.91 3.45 29.27 1.5 24 1.5 14.97 1.5 7.38 6.91 3.9 14.6l6.72 5.22C12.4 13.47 17.73 9.5 24 9.5z"/>
+                                    <path fill="#4285F4" d="M46.1 24.5c0-1.64-.15-3.22-.42-4.74H24v8.98h12.42c-.54 2.88-2.17 5.32-4.62 6.96l7.1 5.52C43.23 37.13 46.1 31.27 46.1 24.5z"/>
+                                    <path fill="#FBBC05" d="M10.62 28.18A14.56 14.56 0 0 1 9.5 24c0-1.45.25-2.86.62-4.18L3.4 14.6A22.46 22.46 0 0 0 1.5 24c0 3.37.73 6.56 2.04 9.43l7.08-5.25z"/>
+                                    <path fill="#34A853" d="M24 46.5c5.27 0 9.69-1.74 12.92-4.74l-7.1-5.52c-1.75 1.17-3.99 1.86-5.82 1.86-6.27 0-11.6-3.97-13.38-9.92l-7.08 5.25C7.38 41.09 14.97 46.5 24 46.5z"/>
+                                </svg>
+                                GOOGLE SIGN IN
+                            </button>
+                        </div>
                     </form>
 
-                    <div className="bg-slate-50 px-6 py-4 md:px-8 border-t border-slate-100 text-center">
-                        <p className="text-sm text-slate-500">
-                            {isLogin ? "Don't have an account?" : "Already have an account?"}
+                    <div className="bg-light px-8 py-6 border-t border-border text-center">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                            {isLogin ? "NEW TO THE SYSTEM?" : "ALREADY ENROLLED?"}
                             <button
                                 type="button"
                                 onClick={() => setIsLogin(!isLogin)}
-                                className="ml-1 text-primary font-bold hover:underline focus:outline-none"
+                                className="ml-2 text-secondary hover:underline focus:outline-none"
                             >
-                                {isLogin ? 'Sign Up' : 'Log In'}
+                                {isLogin ? 'CREATE ACCOUNT' : 'LOG IN'}
                             </button>
                         </p>
                     </div>
