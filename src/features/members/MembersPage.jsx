@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../auth/AuthContext';
 import { fetchAllMembersWithSubMembers, approveSubMember, rejectSubMember, updateUserEmail } from './memberService';
-import { fetchTransactions } from '../transactions/transactionService';
+import { fetchTransactions, createWithdrawal } from '../transactions/transactionService';
 import EmailEditModal from './EmailEditModal';
 
 export default function MembersPage() {
@@ -10,6 +10,7 @@ export default function MembersPage() {
     const [transactions, setTransactions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [editModal, setEditModal] = useState({ open: false, user: null });
+    const [withdrawalModal, setWithdrawalModal] = useState({ open: false, member: null, amount: '', error: '' });
 
     const loadData = async () => {
         setLoading(true);
@@ -71,6 +72,12 @@ export default function MembersPage() {
                 .filter(t => t.type === 'HULOG' && t.status === 'approved')
                 .reduce((sum, t) => sum + t.amount, 0);
 
+            const totalWithdrawal = memberTx
+                .filter(t => t.type === 'WITHDRAWAL' && t.status === 'approved')
+                .reduce((sum, t) => sum + t.amount, 0);
+
+            const netSavings = totalHulog - totalWithdrawal;
+
             const totalUtang = memberTx
                 .filter(t => t.type === 'UTANG' && t.status === 'approved')
                 .reduce((sum, t) => sum + t.balance, 0);
@@ -83,6 +90,8 @@ export default function MembersPage() {
                 ...m,
                 totalTransactions: memberTx.length,
                 totalHulog,
+                totalWithdrawal,
+                netSavings,
                 totalUtang,
                 totalInterest
             };
@@ -114,7 +123,7 @@ export default function MembersPage() {
                                 <th className="p-4">Type</th>
                                 <th className="p-4">Email / Parent</th>
                                 <th className="p-4 text-center">Tx Count</th>
-                                <th className="p-4 text-right">Total Hulog</th>
+                                <th className="p-4 text-right">Total Savings (Net)</th>
                                 <th className="p-4 text-right">Total Utang</th>
                                 <th className="p-4 text-right">Total Interest</th>
                                 <th className="p-4 text-center">Status</th>
@@ -166,7 +175,12 @@ export default function MembersPage() {
                                             {m.totalTransactions}
                                         </td>
                                         <td className="p-4 text-right font-medium text-emerald-600">
-                                            {m.totalHulog > 0 ? `₱ ${m.totalHulog.toLocaleString()}` : '-'}
+                                            {m.netSavings > 0 ? `₱ ${m.netSavings.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : '-'}
+                                            {m.totalWithdrawal > 0 && (
+                                                <div className="text-[10px] text-slate-400 font-normal">
+                                                    Deposited: ₱{m.totalHulog.toLocaleString()}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="p-4 text-right font-medium text-rose-600">
                                             {m.totalUtang > 0 ? `₱ ${m.totalUtang.toLocaleString()}` : '-'}
@@ -187,22 +201,33 @@ export default function MembersPage() {
                                             )}
                                         </td>
                                         <td className="p-4 text-center">
-                                            {m.type === 'SUB' && (!m.status || m.status === 'pending') && (
-                                                <div className="flex gap-2 justify-center">
+                                            <div className="flex gap-2 justify-center">
+                                                {m.type === 'SUB' && (!m.status || m.status === 'pending') && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => handleApprove(m)}
+                                                            className="bg-primary text-white p-1 rounded hover:bg-emerald-600 transition text-xs px-2"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleReject(m)}
+                                                            className="bg-slate-200 text-slate-700 p-1 rounded hover:bg-slate-300 transition text-xs px-2"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </>
+                                                )}
+                                                {((m.type === 'MAIN') || (m.type === 'SUB' && m.status === 'approved')) && (
                                                     <button
-                                                        onClick={() => handleApprove(m)}
-                                                        className="bg-primary text-white p-1 rounded hover:bg-emerald-600 transition text-xs px-2"
+                                                        onClick={() => setWithdrawalModal({ open: true, member: m, amount: '', error: '' })}
+                                                        disabled={m.netSavings <= 0}
+                                                        className="bg-amber-500 text-white p-1 px-3 rounded hover:bg-amber-600 transition text-xs font-semibold shadow-sm disabled:opacity-40 disabled:hover:bg-amber-500 disabled:cursor-not-allowed cursor-pointer"
                                                     >
-                                                        Approve
+                                                        Withdraw
                                                     </button>
-                                                    <button
-                                                        onClick={() => handleReject(m)}
-                                                        className="bg-slate-200 text-slate-700 p-1 rounded hover:bg-slate-300 transition text-xs px-2"
-                                                    >
-                                                        Reject
-                                                    </button>
-                                                </div>
-                                            )}
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -226,6 +251,104 @@ export default function MembersPage() {
                     }}
                     updateEmailService={updateUserEmail}
                 />
+            )}
+
+            {withdrawalModal.open && (
+                <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                    <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl border border-slate-200 relative animate-fade-in">
+                        <button 
+                            onClick={() => setWithdrawalModal({ open: false, member: null, amount: '', error: '' })} 
+                            className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition bg-slate-100 hover:bg-slate-200 p-1.5 rounded-full"
+                        >
+                            ✕
+                        </button>
+                        <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2 mb-2">
+                            <span className="text-amber-500">💰</span> Withdraw Savings
+                        </h2>
+                        <p className="text-sm text-slate-500 mb-6">
+                            Create a savings withdrawal transaction for <span className="font-semibold text-slate-700">{withdrawalModal.member.displayName || withdrawalModal.member.name}</span>.
+                        </p>
+
+                        <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-6 flex justify-between items-center">
+                            <div>
+                                <p className="text-xs text-slate-500 uppercase font-semibold">Available Savings</p>
+                                <p className="text-2xl font-bold text-emerald-600">
+                                    ₱{withdrawalModal.member.netSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            const amt = parseFloat(withdrawalModal.amount);
+                            if (isNaN(amt) || amt <= 0) {
+                                setWithdrawalModal(prev => ({ ...prev, error: "Please enter a valid amount greater than ₱0" }));
+                                return;
+                            }
+                            if (amt > withdrawalModal.member.netSavings) {
+                                setWithdrawalModal(prev => ({ ...prev, error: `Withdrawal cannot exceed available savings of ₱${withdrawalModal.member.netSavings.toLocaleString()}` }));
+                                return;
+                            }
+
+                            const { member } = withdrawalModal;
+                            const uid = member.type === 'MAIN' ? member.id : member.parentId;
+                            const displayName = member.type === 'MAIN' ? (member.displayName || member.email) : member.name;
+                            const memberId = member.type === 'MAIN' ? null : member.id;
+
+                            const res = await createWithdrawal(uid, amt, displayName, memberId);
+                            if (res.success) {
+                                setWithdrawalModal({ open: false, member: null, amount: '', error: '' });
+                                alert(`Successfully withdrew ₱${amt.toLocaleString()} from ${displayName}'s savings.`);
+                                loadData();
+                            } else {
+                                setWithdrawalModal(prev => ({ ...prev, error: "Failed to create withdrawal transaction: " + (res.error?.message || "Unknown error") }));
+                            }
+                        }}>
+                            <div className="mb-4">
+                                <label className="block text-sm font-semibold text-slate-700 mb-1">Withdrawal Amount (₱)</label>
+                                <input
+                                    type="number"
+                                    step="any"
+                                    required
+                                    autoFocus
+                                    placeholder="Enter amount"
+                                    value={withdrawalModal.amount}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        let error = '';
+                                        if (parseFloat(val) > withdrawalModal.member.netSavings) {
+                                            error = `Amount exceeds available savings of ₱${withdrawalModal.member.netSavings.toLocaleString()}`;
+                                        }
+                                        setWithdrawalModal(prev => ({ ...prev, amount: val, error }));
+                                    }}
+                                    className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none"
+                                />
+                                {withdrawalModal.error && (
+                                    <p className="text-red-500 text-xs mt-2 font-medium bg-red-50 p-2 rounded border border-red-100 flex items-center gap-1.5 animate-pulse">
+                                        <span>⚠️</span> {withdrawalModal.error}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="flex gap-3 justify-end mt-6">
+                                <button
+                                    type="button"
+                                    onClick={() => setWithdrawalModal({ open: false, member: null, amount: '', error: '' })}
+                                    className="px-4 py-2 border rounded-lg bg-white text-slate-700 hover:bg-slate-50 transition text-sm font-semibold cursor-pointer"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    disabled={!withdrawalModal.amount || parseFloat(withdrawalModal.amount) <= 0 || parseFloat(withdrawalModal.amount) > withdrawalModal.member.netSavings}
+                                    className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                                >
+                                    Confirm Withdrawal
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             )}
         </div>
     );

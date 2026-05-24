@@ -47,6 +47,8 @@ export default function AdminDashboard() {
             if (t.status === 'approved' || t.status === 'paid') {
                 if (t.type === 'HULOG') {
                     currentBalance += t.amount;
+                } else if (t.type === 'WITHDRAWAL') {
+                    currentBalance -= t.amount;
                 } else if (t.type === 'UTANG') {
                     currentBalance -= t.principal; // Deduct Principal
                 } else if (t.type === 'PAYMENT') {
@@ -197,12 +199,16 @@ export default function AdminDashboard() {
                 {/* Financial Summary Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="bg-white p-4 rounded-lg shadow border-l-4 border-emerald-500">
-                        <p className="text-xs font-semibold text-slate-500 uppercase">Total Hulog (Savings)</p>
+                        <p className="text-xs font-semibold text-slate-500 uppercase">Total Savings (Net)</p>
                         <p className="text-2xl font-bold text-emerald-600">
-                            ₱ {transactions
-                                .filter(t => t.type === 'HULOG' && t.status === 'approved')
-                                .reduce((sum, t) => sum + t.amount, 0)
-                                .toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            ₱ {(
+                                transactions
+                                    .filter(t => t.type === 'HULOG' && t.status === 'approved')
+                                    .reduce((sum, t) => sum + t.amount, 0) -
+                                transactions
+                                    .filter(t => t.type === 'WITHDRAWAL' && t.status === 'approved')
+                                    .reduce((sum, t) => sum + t.amount, 0)
+                            ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </p>
                     </div>
                     <div className="bg-white p-4 rounded-lg shadow border-l-4 border-rose-500">

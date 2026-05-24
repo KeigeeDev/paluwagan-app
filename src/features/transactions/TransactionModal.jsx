@@ -36,6 +36,7 @@ export default function TransactionModal({ isOpen, onClose, transaction, allTran
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full relative overflow-hidden">
                 {/* Header */}
                 <div className={`p-4 ${transaction.type === 'HULOG' ? 'bg-emerald-600' :
+                    transaction.type === 'WITHDRAWAL' ? 'bg-amber-600' :
                     transaction.type === 'PAYMENT' ? 'bg-indigo-600' :
                         'bg-rose-600'
                     } text-white flex justify-between items-start`}>
@@ -56,6 +57,7 @@ export default function TransactionModal({ isOpen, onClose, transaction, allTran
                         <div>
                             <p className="text-sm text-slate-500 mb-1">Amount</p>
                             <p className={`text-3xl font-bold ${transaction.type === 'HULOG' ? 'text-emerald-600' :
+                                transaction.type === 'WITHDRAWAL' ? 'text-amber-600' :
                                 transaction.type === 'PAYMENT' ? 'text-indigo-600' :
                                     'text-rose-600'
                                 }`}>
@@ -103,6 +105,13 @@ export default function TransactionModal({ isOpen, onClose, transaction, allTran
                         {transaction.type === 'HULOG' && (
                             <div className="p-3 bg-emerald-50 rounded border border-emerald-100 text-center text-emerald-700 text-sm">
                                 Verified Deposit
+                            </div>
+                        )}
+
+                        {/* WITHDRAWAL Specifics */}
+                        {transaction.type === 'WITHDRAWAL' && (
+                            <div className="p-3 bg-amber-50 rounded border border-amber-100 text-center text-amber-700 text-sm font-medium">
+                                Savings Withdrawal Approved
                             </div>
                         )}
 
