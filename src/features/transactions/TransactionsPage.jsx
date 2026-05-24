@@ -131,6 +131,7 @@ export default function TransactionsPage() {
                                         >
                                             <option value="">All</option>
                                             <option value="HULOG">Hulog</option>
+                                            <option value="WITHDRAWAL">Withdrawal</option>
                                             <option value="UTANG">Utang</option>
                                             <option value="PAYMENT">Payment</option>
                                         </select>
@@ -188,6 +189,7 @@ export default function TransactionsPage() {
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-2 py-1 rounded text-xs font-bold ${t.type === 'HULOG' ? 'bg-emerald-100 text-emerald-700' :
+                                                    t.type === 'WITHDRAWAL' ? 'bg-amber-100 text-amber-700' :
                                                     t.type === 'PAYMENT' ? 'bg-indigo-100 text-indigo-700' :
                                                         'bg-rose-100 text-rose-700'
                                                 }`}>
@@ -198,6 +200,7 @@ export default function TransactionsPage() {
                                             {t.beneficiaryName || 'Self'}
                                         </td>
                                         <td className={`p-4 font-bold ${t.type === 'HULOG' ? 'text-emerald-600' :
+                                                t.type === 'WITHDRAWAL' ? 'text-amber-600' :
                                                 t.type === 'PAYMENT' ? 'text-indigo-600' :
                                                     'text-rose-600'
                                             }`}>

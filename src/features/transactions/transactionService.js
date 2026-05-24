@@ -78,6 +78,29 @@ export const requestHulog = async (uid, amount, displayName, memberId = null) =>
 };
 
 /**
+ * Creates a WITHDRAWAL transaction (Admin action)
+ */
+export const createWithdrawal = async (uid, amount, displayName, memberId = null) => {
+    try {
+        await addDoc(collection(db, COLLECTION_NAME), {
+            uid,
+            memberId, // Link to specific sub-account if applicable
+            beneficiaryName: displayName,
+            type: "WITHDRAWAL",
+            amount: Number(amount),
+            status: "approved", // Admin creates it, so it is auto-approved
+            date: Timestamp.now(),
+            fiscalYear: getFiscalYear(),
+            isArchived: false,
+        });
+        return { success: true };
+    } catch (error) {
+        console.error("Error creating withdrawal:", error);
+        return { success: false, error };
+    }
+};
+
+/**
  * Creates an UTANG request
  * Implements Logic #5: 3% Member / 5% Non-member
  * Implements Logic #5: Immediate 1-month interest application

@@ -100,6 +100,16 @@ export default function MemberDashboard() {
             .reduce((sum, t) => sum + t.amount, 0);
     }, [filteredTransactions]);
 
+    const totalWithdrawal = useMemo(() => {
+        return filteredTransactions
+            .filter(t => t.type === 'WITHDRAWAL' && t.status === 'approved')
+            .reduce((sum, t) => sum + t.amount, 0);
+    }, [filteredTransactions]);
+
+    const netSavings = useMemo(() => {
+        return totalHulog - totalWithdrawal;
+    }, [totalHulog, totalWithdrawal]);
+
     const totalUtang = useMemo(() => {
         return filteredTransactions
             .filter(t => t.type === 'UTANG' && t.status === 'approved')
@@ -238,8 +248,8 @@ export default function MemberDashboard() {
             {/* Stats Overview */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl p-6 text-white shadow-lg transform hover:scale-[1.02] transition">
-                    <h2 className="text-emerald-100 font-medium mb-1">Total Savings (Hulog)</h2>
-                    <p className="text-3xl font-bold">₱ {totalHulog.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    <h2 className="text-emerald-100 font-medium mb-1">Total Savings (Net)</h2>
+                    <p className="text-3xl font-bold">₱ {netSavings.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                     <p className="text-xs text-emerald-100 mt-2 opacity-80">For {getCurrentProfileName()}</p>
                 </div>
                 <div className="bg-gradient-to-br from-rose-500 to-red-600 rounded-xl p-6 text-white shadow-lg transform hover:scale-[1.02] transition">
@@ -422,6 +432,7 @@ export default function MemberDashboard() {
                                         >
                                             <option value="">All</option>
                                             <option value="HULOG">Hulog</option>
+                                            <option value="WITHDRAWAL">Withdrawal</option>
                                             <option value="UTANG">Utang</option>
                                             <option value="PAYMENT">Payment</option>
                                         </select>
@@ -465,6 +476,7 @@ export default function MemberDashboard() {
                                     <td className="p-4 text-slate-500 text-sm">{new Date(t.date.seconds * 1000).toLocaleDateString()}</td>
                                     <td className="p-4 font-medium text-sm">
                                         <span className={`px-2 py-1 rounded ${t.type === 'HULOG' ? 'bg-emerald-100 text-emerald-700' :
+                                            t.type === 'WITHDRAWAL' ? 'bg-amber-100 text-amber-700' :
                                             t.type === 'PAYMENT' ? 'bg-indigo-100 text-indigo-700' :
                                                 'bg-rose-100 text-rose-700'
                                             }`}>
@@ -473,6 +485,7 @@ export default function MemberDashboard() {
                                     </td>
                                     <td onClick={() => setSelectedTransaction(t)} className="p-4 text-sm font-medium text-slate-700 cursor-pointer hover:text-primary transition">{t.beneficiaryName || 'Self'}</td>
                                     <td onClick={() => setSelectedTransaction(t)} className={`p-4 font-bold cursor-pointer hover:opacity-80 transition ${t.type === 'HULOG' ? 'text-primary' :
+                                        t.type === 'WITHDRAWAL' ? 'text-amber-600' :
                                         t.type === 'PAYMENT' ? 'text-indigo-600' :
                                             'text-danger'
                                         }`}>
